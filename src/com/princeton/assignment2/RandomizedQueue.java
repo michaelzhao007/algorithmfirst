@@ -1,3 +1,5 @@
+package com.princeton.assignment2;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
