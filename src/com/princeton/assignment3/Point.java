@@ -1,4 +1,3 @@
-package com.princeton.assignment3;
 
 import java.util.Comparator;
 
@@ -52,8 +51,12 @@ public class Point implements Comparable<Point> {
                 return Double.NEGATIVE_INFINITY;
             else
                 return Double.POSITIVE_INFINITY;
-        } else if (this.y == that.y)
+        } else if (this.y == that.y) {
+            if(this.x==that.x) return Double.NEGATIVE_INFINITY;
+            else {
             return 0;
+            }
+        }
         else {
             return (double) (that.y - this.y) / (double) (that.x - this.x);
         }

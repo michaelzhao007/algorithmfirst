@@ -1,49 +1,82 @@
-package com.princeton.assignment3;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class FastCollinearPoints {
     private List<LineSegment> list = new ArrayList<LineSegment>();
-    private Map<Point, Point> map = new HashMap<Point, Point>();
+    private List<ArrayList<Point>> res = new ArrayList<ArrayList<Point>>();
 
     public FastCollinearPoints(Point[] points) {
         for (int i = 0; i < points.length; i++) {
-            Arrays.sort(points, points[i].slopeOrder());
-            double[] ptCp = new double[points.length - 1];
+            double[] ptCp = new double[points.length];
 
             Point[] pointCopy = new Point[points.length];
-            int k = 0;
 
             for (int t = 0; t < points.length; t++) {
                 pointCopy[t] = points[t];
-                if (t != i) {
-                    ptCp[k++] = points[i].slopeTo(points[t]);
-                }
+                ptCp[t] = points[i].slopeTo(points[t]);
             }
 
             Arrays.sort(ptCp);
-
             Arrays.sort(pointCopy, pointCopy[i].slopeOrder());
 
-            for (int m = 0; m < ptCp.length - 2; m++) {
-                if (ptCp[m] == ptCp[m + 1] && ptCp[m + 1] == ptCp[m + 2]) {
-                    Point[] res = new Point[4];
-                    res[0] = pointCopy[m + 1];
-                    res[1] = pointCopy[m + 2];
-                    res[2] = pointCopy[m + 3];
-                    res[3] = pointCopy[0];
-                    Arrays.sort(res);
-                    if (!(map.containsKey(res[0]) && map.get(res[0]) == res[3])
-                            && !(map.containsKey(res[3]) && map.get(res[3]) == res[0])) {
-                        map.put(res[0], res[3]);
-                        list.add(new LineSegment(res[0], res[3]));
-                    }
+            int h = 0;
+            for (int m = 0; m < ptCp.length; m++) {
+                ArrayList<Point> pList = new ArrayList<Point>();
+                while ((m + h) < ptCp.length && ptCp[m] == ptCp[m + h]) {
+                    pList.add(pointCopy[m + h]);
+                    h++;
                 }
+                if (h < 3) {
+                    h = 0;
+                    pList.clear();
+                }
+                if (h >= 3) {
+                    pList.add(pointCopy[m]);
+                    pList.add(pointCopy[0]);
+                    Collections.sort(pList);
+
+                    if (res.size() == 0) {
+                        ArrayList<Point> newList = new ArrayList<Point>();
+                        newList.add(pList.get(0));
+                        newList.add(pList.get(pList.size() - 1));
+                        res.add(newList);
+                    } else {
+                        boolean flg = false;
+                        for (int pp = 0; pp < res.size(); pp++) {
+                            if ((res.get(pp).get(0).compareTo(pList.get(0)) == 0 && res
+                                    .get(pp).get(1)
+                                    .compareTo(pList.get(pList.size() - 1)) == 0)
+                                    || (res.get(pp).get(1)
+                                            .compareTo(pList.get(0)) == 0 && res
+                                            .get(pp)
+                                            .get(0)
+                                            .compareTo(
+                                                    pList.get(pList.size() - 1)) == 0)) {
+                                flg = true;
+                            }
+                        }
+
+                        if (!flg) {
+                            ArrayList<Point> newList = new ArrayList<Point>();
+                            newList.add(pList.get(0));
+                            newList.add(pList.get(pList.size() - 1));
+                            res.add(newList);
+                        }
+
+                    }
+
+                }
+
+                pList.clear();
+                h = 0;
             }
+
+        }
+        for (List<Point> testList : res) {
+            list.add(new LineSegment(testList.get(0), testList.get(1)));
         }
     }
 
